@@ -2,7 +2,11 @@ POST http://localhost:7071/api/CreateEvent
 Content-Type: application/json
 
 {
-  "title": "Sydney Tech Summit 2026",
-  "date": "2026-03-15T09:00:00Z",
-  "location": "ICC Sydney"
+  "title": "Women In Cloud",
+  "date": "2026-04-15T09:00:00Z",
+  "location": "REA Melbourne"
 }
+
+
+### Get all events
+GET http://localhost:7071/api/GetEvents
