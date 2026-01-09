@@ -2,9 +2,9 @@ POST http://localhost:7071/api/CreateEvent
 Content-Type: application/json
 
 {
-  "title": "Women In Cloud",
-  "date": "2026-04-15T09:00:00Z",
-  "location": "REA Melbourne"
+  "title": " Grad Girls Meet and Greet ",
+  "date": "2026-01-14T09:00:00Z ",
+  "location": "AGL Melbourne"
 }
 
 

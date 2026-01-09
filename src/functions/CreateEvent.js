@@ -20,6 +20,25 @@ app.http('CreateEvent', {
             // Read the JSON body from the incoming HTTP Request
             const eventData = await request.json();
 
+            // 1. Check if title exists AND if it's not just empty spaces after trimming
+            if (!eventData.title || eventData.title.trim().length === 0) {
+                return {
+                    status: 400,
+                    jsonBody: { error: "Title is required and cannot be empty or just spaces." }
+                };
+            }
+
+            // 2. Do the same for date (optional but recommended)
+            if (!eventData.date || eventData.date.trim().length === 0) {
+                return {
+                    status: 400,
+                    jsonBody: { error: "Date is required." }
+                };
+            }
+
+            // 3. Update the data to use the trimmed version so you don't save accidental spaces to the database
+            //const finalTitle = eventData.title.trim();
+
             // ---Validation Logic ---
             if (!eventData || !eventData.title || !eventData.date) {
                 return {
