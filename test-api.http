@@ -1,3 +1,22 @@
+
+### LIVE API URLS
+@baseUrl = https://event-api-wic-czdvc8bwfsb7drag.australiaeast-01.azurewebsites.net/api
+
+### Get all events (Live)
+GET {{baseUrl}}/getevents
+
+### Create an event (Live)
+POST {{baseUrl}}/createevent
+Content-Type: application/json
+
+{
+    "title": "Cloud Success Celebration",
+    "date": "2026-01-14T10:00:00Z",
+    "location": "Internet"
+}
+
+
+
 POST http://localhost:7071/api/CreateEvent
 Content-Type: application/json
 
@@ -10,3 +29,5 @@ Content-Type: application/json
 
 ### Get all events
 GET http://localhost:7071/api/GetEvents
+
+
