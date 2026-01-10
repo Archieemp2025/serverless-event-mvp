@@ -31,3 +31,19 @@ Content-Type: application/json
 GET http://localhost:7071/api/GetEvents
 
 
+### Test RegisterUser (Local)
+POST http://localhost:7071/api/RegisterUser
+Content-Type: application/json
+
+{
+    "email": "nat.test@example.com",
+    "eventId": "9a337808-4894-4a35-95aa-90f79c0f80ad"
+}
+
+### Test RegisterUser with missing data (Should fail)
+POST http://localhost:7071/api/RegisterUser
+Content-Type: application/json
+
+{
+    "email": " "
+}
