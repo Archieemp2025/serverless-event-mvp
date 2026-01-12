@@ -10,9 +10,18 @@ POST {{baseUrl}}/createevent
 Content-Type: application/json
 
 {
-    "title": "Cloud Success Celebration",
-    "date": "2026-01-14T10:00:00Z",
-    "location": "Internet"
+    "id": "test-old-id-999",
+    "title": "Old Retro Party",
+    "date": "2020-01-01T00:00:00.000Z",
+    "location": "Memory Lane"
+}
+
+### Manually Trigger CleanUpOldEvents (Local)
+POST http://localhost:7071/admin/functions/CleanupOldEvents
+Content-Type: application/json
+
+{
+    "input": "{}"
 }
 
 

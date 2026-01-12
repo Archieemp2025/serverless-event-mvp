@@ -19,7 +19,7 @@ app.timer('CleanUpOldEvents', {
         // 1. Query for events where the date is in the past
        // Note: Ensure your event objects have an 'eventDate' field in ISO format
        const querySpec = {
-           query: "SELECT * FROM c WHERE c.eventDate < @now",
+           query: "SELECT * FROM c WHERE c.date < @now",
            parameters: [{name: "@now", value: isoNow}]
        };
 
