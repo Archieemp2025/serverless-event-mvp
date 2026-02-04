@@ -82,7 +82,7 @@
 //     setLoading(true);
 //     try {
 //       // Points to your RegisterUser function
-//       const REGISTER_URL = "https://event-api-wic-czdvc8bwfsb7drag.australiaeast-01.azurewebsites.net/api/RegisterUser";
+//       const REGISTER_URL = "";
       
 //       await axios.post(REGISTER_URL, {
 //         eventId: event.id,
@@ -154,7 +154,7 @@ export default function EventCard({ event }) {
   const [isRegistered, setIsRegistered] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  // Form State
+  // Form State for the Popup
   const [formData, setFormData] = useState({ fullName: '', mobile: '', email: '' });
 
   const handleRegister = async (e) => {
@@ -162,10 +162,17 @@ export default function EventCard({ event }) {
     setLoading(true);
     try {
       const REGISTER_URL = "https://event-api-wic-czdvc8bwfsb7drag.australiaeast-01.azurewebsites.net/api/RegisterUser";
-      await axios.post(REGISTER_URL, { ...formData, eventId: event.id });
+      
+      await axios.post(REGISTER_URL, { 
+        ...formData, 
+        eventId: event.id 
+      });
+
       setIsRegistered(true);
-      setTimeout(() => setShowModal(false), 2000); // Close modal after success
+      // Briefly show success before closing the modal
+      setTimeout(() => setShowModal(false), 1500); 
     } catch (error) {
+      console.error("Registration failed:", error);
       alert("Registration failed. Please try again.");
     } finally {
       setLoading(false);
@@ -173,53 +180,103 @@ export default function EventCard({ event }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col gap-4">
-      {/* Event Details (Badges, Title, etc.) */}
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col gap-4 hover:shadow-md transition-all">
+      
+      {/* 1. Date and Time Badges (From previous version) */}
       <div className="flex gap-2">
         <span className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-          <Calendar size={14} /> {event.date}
+          <Calendar size={14} /> {event.date || 'TBD'}
+        </span>
+        <span className="bg-gray-50 text-gray-600 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+          <Clock size={14} /> {event.time || '09:00 AM'}
         </span>
       </div>
-      <h3 className="text-xl font-bold text-gray-900">{event.title}</h3>
 
-      {/* Main Action Button */}
+      {/* 2. Event Title */}
+      <h3 className="text-xl font-bold text-gray-900 leading-tight">
+        {event.title}
+      </h3>
+
+      {/* 3. Location and Registered Count (Restored) */}
+      <div className="space-y-2 text-gray-500 text-sm">
+        <div className="flex items-center gap-2">
+          <MapPin size={16} className="text-gray-400" />
+          <span>{event.location}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Users size={16} className="text-gray-400" />
+          <span>{event.registeredCount || 0} People Registered</span>
+        </div>
+      </div>
+
+      {/* 4. Dashboard Action Button */}
       <button 
         onClick={() => !isRegistered && setShowModal(true)}
-        className={`mt-2 w-full py-3 font-bold rounded-xl transition-all ${isRegistered ? 'bg-green-100 text-green-700' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+        disabled={isRegistered}
+        className={`mt-2 w-full py-3 font-bold rounded-xl transition-all shadow-lg 
+          ${isRegistered 
+            ? 'bg-green-100 text-green-700 shadow-none' 
+            : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-100'
+          }`}
       >
-        {isRegistered ? " Registered" : "Register Now"}
+        {isRegistered ? (
+          <span className="flex items-center justify-center gap-2"><CheckCircle size={18} /> Registered</span>
+        ) : "Register Now"}
       </button>
 
-      {/* --- REGISTRATION MODAL --- */}
+      {/* --- REGISTRATION MODAL POPUP --- */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200">
-            <button onClick={() => setShowModal(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-600">
+            {/* Close Button */}
+            <button 
+              onClick={() => setShowModal(false)} 
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-600"
+            >
               <X size={24} />
             </button>
             
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Register for Event</h2>
-            <p className="text-gray-500 mb-6">{event.title}</p>
+            <p className="text-gray-500 mb-6 font-medium">{event.title}</p>
 
-            <form onSubmit={handleRegister} className="space-y-4">
+            <form onSubmit={handleRegister} className="space-y-4 text-left">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
-                <input required type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" 
-                  onChange={(e) => setFormData({...formData, fullName: e.target.value})} />
+                <input 
+                  required 
+                  placeholder="Enter your full name"
+                  type="text" 
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                  onChange={(e) => setFormData({...formData, fullName: e.target.value})} 
+                />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Mobile Number</label>
-                <input required type="tel" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" 
-                  onChange={(e) => setFormData({...formData, mobile: e.target.value})} />
+                <input 
+                  required 
+                  placeholder="Enter your mobile number"
+                  type="tel" 
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                  onChange={(e) => setFormData({...formData, mobile: e.target.value})} 
+                />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Email ID</label>
-                <input required type="email" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" 
-                  onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                <input 
+                  required 
+                  placeholder="Enter your email address"
+                  type="email" 
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
+                  onChange={(e) => setFormData({...formData, email: e.target.value})} 
+                />
               </div>
 
-              <button type="submit" disabled={loading} className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all mt-4">
-                {loading ? "Registering..." : isRegistered ? "Success!" : "Complete Registration"}
+              <button 
+                type="submit" 
+                disabled={loading} 
+                className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all mt-4 shadow-lg shadow-indigo-100 disabled:bg-gray-300"
+              >
+                {loading ? "Processing..." : "Complete Registration"}
               </button>
             </form>
           </div>
