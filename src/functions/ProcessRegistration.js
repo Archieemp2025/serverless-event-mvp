@@ -193,27 +193,26 @@ app.storageQueue('ProcessRegistration', {
     handler: async (queueItem, context) => {
         context.log('Processing registration for:', queueItem.email);
         
-        // 1. Setup SendGrid & Cosmos
         sgMail.setApiKey(process.env.SendGridApiKey);
         
-        // Match the connection string name in your local.settings.json / Azure Portal
+        // Use the connection string name exactly as it appears in your settings
         const connectionString = process.env.CosmosDBConnection;
         const client = new CosmosClient(connectionString);
         
-        const database = client.database("EventDB"); // Ensure this matches your DB name
+        const database = client.database("EventDB"); 
         const eventsContainer = database.container("Events");
         const registrationsContainer = database.container("Registrations");
 
         try {
-            // 2. Fetch Event Details first to ensure the event exists
+            // 1. Fetch Event Details
             const { resource: event } = await eventsContainer.item(queueItem.eventId, queueItem.eventId).read();
 
             if (!event) {
-                context.log(` Event not found for ID: ${queueItem.eventId}`);
+                context.log(` Event not found: ${queueItem.eventId}`);
                 return;
             }
 
-            // 3. Save User to "Registrations" Container
+            // 2. Save Registration
             const newRegistration = {
                 id: `${queueItem.eventId}-${queueItem.email}`, 
                 eventId: queueItem.eventId,
@@ -223,56 +222,53 @@ app.storageQueue('ProcessRegistration', {
                 registeredAt: new Date().toISOString()
             };
             await registrationsContainer.items.upsert(newRegistration);
-            context.log(` Registration record created for ${queueItem.fullName}`);
 
-            // 4. Update the Event's Registered Count
+            // 3. Update Event Count
             event.registeredCount = (event.registeredCount || 0) + 1;
             await eventsContainer.items.upsert(event);
-            context.log(` Incrementing count for event: ${event.title}`);
 
-            // 5. Format Date and Time from the single "date" field in Cosmos
-            const eventObj = new Date(event.date);
-            
-            const formattedDate = eventObj.toLocaleDateString('en-AU', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
+            // 4. DATE & TIME FIX: Trim the string to remove the hidden space
+            const rawDateString = event.date ? event.date.trim() : null;
+            const eventObj = new Date(rawDateString);
 
-            const formattedTime = eventObj.toLocaleTimeString('en-AU', {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
-            });
+            // Check if date is valid, otherwise use a fallback string
+            const isValidDate = !isNaN(eventObj.getTime());
 
-            // 6. Send the Email Ticket
+            const formattedDate = isValidDate 
+                ? eventObj.toLocaleDateString('en-AU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+                : "Date to be announced";
+
+            const formattedTime = isValidDate 
+                ? eventObj.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true })
+                : "Time to be announced";
+
+            // 5. Send the Email
             const msg = {
                 to: queueItem.email,
                 from: {
                     email: 'anatempl2025@gmail.com',
-                    name: 'Evently Confirmation' // Professional sender name
+                    name: 'Microsoft Student Accelerator'
                 },
                 subject: ` Ticket Confirmed: ${event.title}`,
                 html: `
-                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden;">
-                        <div style="background-color: #0078d4; padding: 20px; text-align: center; color: white;">
-                            <h1 style="margin: 0;">Event Ticket</h1>
+                    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <div style="background-color: #0078d4; padding: 30px; text-align: center; color: white;">
+                            <h1 style="margin: 0; font-size: 28px;">Event Ticket</h1>
                         </div>
                         <div style="padding: 30px; line-height: 1.6; color: #333;">
-                            <p>Hi <strong>${queueItem.fullName}</strong>,</p>
+                            <p style="font-size: 18px;">Hi <strong>${queueItem.fullName}</strong>,</p>
                             <p>You're officially registered! Please keep this email as your ticket for entry.</p>
                             
-                            <div style="background-color: #f3f2f1; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                                <h2 style="margin-top: 0; color: #0078d4;">${event.title}</h2>
-                                <p style="margin: 5px 0;"> <strong>Location:</strong> ${event.location}</p>
-                                <p style="margin: 5px 0;"> <strong>Date:</strong> ${formattedDate}</p>
-                                <p style="margin: 5px 0;"> <strong>Time:</strong> ${formattedTime}</p>
+                            <div style="background-color: #f3f2f1; padding: 25px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #0078d4;">
+                                <h2 style="margin-top: 0; color: #0078d4; font-size: 22px;">${event.title}</h2>
+                                <p style="margin: 10px 0;"> <strong>Location:</strong> ${event.location}</p>
+                                <p style="margin: 10px 0;"> <strong>Date:</strong> ${formattedDate}</p>
+                                <p style="margin: 10px 0;"> <strong>Time:</strong> ${formattedTime}</p>
                             </div>
 
-                            <p style="font-size: 14px; color: #666;"><strong>Ticket ID:</strong> ${newRegistration.id}</p>
+                            <p style="font-size: 13px; color: #666; word-break: break-all;"><strong>Ticket ID:</strong> ${newRegistration.id}</p>
                         </div>
-                        <div style="background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 12px; color: #888;">
+                        <div style="background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee;">
                             © 2026 Microsoft Student Accelerator. All rights reserved.
                         </div>
                     </div>
@@ -283,9 +279,7 @@ app.storageQueue('ProcessRegistration', {
             context.log(` Success: Ticket sent to ${queueItem.email}`);
 
         } catch (error) {
-            context.log(` Processing Error: ${error.message}`);
-            // Note: In a production app, you might want to re-throw the error
-            // to keep the message in the queue for a retry.
+            context.log(` Error: ${error.message}`);
         }
     }
 });
