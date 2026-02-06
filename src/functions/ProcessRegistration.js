@@ -247,7 +247,7 @@ app.storageQueue('ProcessRegistration', {
                 to: queueItem.email,
                 from: {
                     email: 'anatempl2025@gmail.com',
-                    name: 'Microsoft Student Accelerator'
+                    name: 'Evently Ticket Confirmation'
                 },
                 subject: ` Ticket Confirmed: ${event.title}`,
                 html: `
