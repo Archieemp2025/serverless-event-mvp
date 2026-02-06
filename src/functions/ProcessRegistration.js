@@ -197,10 +197,10 @@ app.storageQueue('ProcessRegistration', {
         sgMail.setApiKey(process.env.SendGridApiKey);
         
         // Match the connection string name in your local.settings.json / Azure Portal
-        const connectionString = process.env.CosmosDbConnectionString || process.env.CosmosDBConnection;
+        const connectionString = process.env.CosmosDBConnection;
         const client = new CosmosClient(connectionString);
         
-        const database = client.database("EventlyDB"); // Ensure this matches your DB name
+        const database = client.database("EventDB"); // Ensure this matches your DB name
         const eventsContainer = database.container("Events");
         const registrationsContainer = database.container("Registrations");
 
@@ -251,7 +251,7 @@ app.storageQueue('ProcessRegistration', {
                 to: queueItem.email,
                 from: {
                     email: 'anatempl2025@gmail.com',
-                    name: 'Microsoft Student Accelerator' // Professional sender name
+                    name: 'Evently Confirmation' // Professional sender name
                 },
                 subject: ` Ticket Confirmed: ${event.title}`,
                 html: `
