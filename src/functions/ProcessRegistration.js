@@ -152,7 +152,7 @@ app.storageQueue('ProcessRegistration', {
                 // 4. SEND THE EMAIL TICKET 
                 const msg = {
                     to: queueItem.email,
-                    from: 'your-verified-email@example.com', // Your verified SendGrid sender
+                    from: 'anatempl2025@gmail.com', // Your verified SendGrid sender
                     subject: ` Your Ticket for ${event.title}`,
                     html: `
                         <div style="font-family: sans-serif; border: 2px solid #4f46e5; padding: 20px; border-radius: 15px;">
