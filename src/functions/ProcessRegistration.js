@@ -267,7 +267,9 @@ app.storageQueue('ProcessRegistration', {
                      timeZone: 'UTC' // <--- FORCES UTC DATA
                   })
                 : "Time to be announced"; 
-
+            
+            // This creates a safe URL for Google Maps by replacing spaces with '+'
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
 
             // 5. Send the Email
             const msg = {
@@ -288,7 +290,11 @@ app.storageQueue('ProcessRegistration', {
                             
                             <div style="background-color: #f3f2f1; padding: 25px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #0078d4;">
                                 <h2 style="margin-top: 0; color: #0078d4; font-size: 22px;">${event.title}</h2>
-                                <p style="margin: 10px 0;"> <strong>Location:</strong> ${event.location}</p>
+                                <p style="margin: 10px 0;"> 
+                                    <strong>Location:</strong> ${event.location} 
+                                    <br />
+                                    <a href="${mapsUrl}" style="color: #0078d4; text-decoration: none; font-size: 12px;"> Get Directions</a>
+                                </p>
                                 <p style="margin: 10px 0;"> <strong>Date:</strong> ${formattedDate}</p>
                                 <p style="margin: 10px 0;"> <strong>Time:</strong> ${formattedTime}</p>
                             </div>
