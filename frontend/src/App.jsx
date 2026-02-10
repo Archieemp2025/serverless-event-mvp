@@ -41,18 +41,39 @@ import axios from 'axios';
 import { Search, Calendar as LogoIcon } from 'lucide-react'; // Renamed for logo
 import EventCard from './components/EventCard';
 
+
 function App() {
   const [events, setEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // useEffect(() => {
+  //   const API_URL = "https://event-api-wic-czdvc8bwfsb7drag.australiaeast-01.azurewebsites.net/api/getevents";
+  //   axios.get(API_URL)
+  //     .then(res => { setEvents(res.data); setLoading(false); })
+  //     .catch(() => setLoading(false));
+  // }, []);
+  
   useEffect(() => {
-    const API_URL = "https://event-api-wic-czdvc8bwfsb7drag.australiaeast-01.azurewebsites.net/api/getevents";
-    axios.get(API_URL)
-      .then(res => { setEvents(res.data); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, []);
+    // 1. Get the Base URL from the environment
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    
+    // 2. Combine it with the specific function name
+    const API_URL = `${BASE_URL}/getevents`;
 
+    console.log("Connecting to:", API_URL); // Useful for debugging!
+
+    axios.get(API_URL)
+      .then(res => { 
+        setEvents(res.data); 
+        setLoading(false); 
+      })
+      .catch((err) => {
+        console.error("API Error:", err);
+        setLoading(false); 
+      });
+  }, []);
+  
   // Filtering Logic
   const filteredEvents = events.filter(event => 
     event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

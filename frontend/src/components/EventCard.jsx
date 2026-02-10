@@ -157,19 +157,45 @@ export default function EventCard({ event }) {
   // Form State for the Popup
   const [formData, setFormData] = useState({ fullName: '', mobile: '', email: '' });
 
+  // const handleRegister = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   try {
+  //     const REGISTER_URL = "https://event-api-wic-czdvc8bwfsb7drag.australiaeast-01.azurewebsites.net/api/RegisterUser";
+      
+  //     await axios.post(REGISTER_URL, { 
+  //       ...formData, 
+  //       eventId: event.id 
+  //     });
+
+  //     setIsRegistered(true);
+  //     // Briefly show success before closing the modal
+  //     setTimeout(() => setShowModal(false), 1500); 
+  //   } catch (error) {
+  //     console.error("Registration failed:", error);
+  //     alert("Registration failed. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const REGISTER_URL = "https://event-api-wic-czdvc8bwfsb7drag.australiaeast-01.azurewebsites.net/api/RegisterUser";
+      // 1. Get the Base URL (will be localhost on PC, Azure on the web)
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL;
       
+      // 2. Build the full path for registration
+      const REGISTER_URL = `${BASE_URL}/RegisterUser`;
+      
+      console.log("Registering at:", REGISTER_URL); // Verify in your browser console
+
       await axios.post(REGISTER_URL, { 
         ...formData, 
         eventId: event.id 
       });
 
       setIsRegistered(true);
-      // Briefly show success before closing the modal
       setTimeout(() => setShowModal(false), 1500); 
     } catch (error) {
       console.error("Registration failed:", error);
