@@ -269,9 +269,11 @@ app.storageQueue('ProcessRegistration', {
                 : "Time to be announced";
                 
             // 1. Prepare Data for QR (Ensure Ticket ID is safe for a URL)
-            const qrData = encodeURIComponent(newRegistration.id);
-            // Add a random 'v' parameter to prevent email clients from showing an old cached version
-            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}&v=${Date.now()}`;
+            // const qrData = encodeURIComponent(newRegistration.id);
+            // // Add a random 'v' parameter to prevent email clients from showing an old cached version
+            // const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}&v=${Date.now()}`;
+            const shortId = newRegistration.id.split('-')[0]; // Optional: use a shorter version of the ID
+            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(newRegistration.id)}&size=150x150`;
             
             // This creates a safe URL for Google Maps by replacing spaces with '+'
             const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
