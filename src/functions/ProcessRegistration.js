@@ -227,20 +227,47 @@ app.storageQueue('ProcessRegistration', {
             event.registeredCount = (event.registeredCount || 0) + 1;
             await eventsContainer.items.upsert(event);
 
-            // 4. DATE & TIME FIX: Trim the string to remove the hidden space
+            // // 4. DATE & TIME FIX: Trim the string to remove the hidden space
+            // const rawDateString = event.date ? event.date.trim() : null;
+            // const eventObj = new Date(rawDateString);
+
+            // // Check if date is valid, otherwise use a fallback string
+            // const isValidDate = !isNaN(eventObj.getTime());
+
+            // const formattedDate = isValidDate 
+            //     ? eventObj.toLocaleDateString('en-AU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+            //     : "Date to be announced";
+
+            // const formattedTime = isValidDate 
+            //     ? eventObj.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true })
+            //     : "Time to be announced";
+            // 4. Trim and create the date object
             const rawDateString = event.date ? event.date.trim() : null;
             const eventObj = new Date(rawDateString);
 
-            // Check if date is valid, otherwise use a fallback string
             const isValidDate = !isNaN(eventObj.getTime());
 
+            //  Format Date in UTC (Prevents the day from shifting)
             const formattedDate = isValidDate 
-                ? eventObj.toLocaleDateString('en-AU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+                ? eventObj.toLocaleDateString('en-AU', { 
+                     weekday: 'long', 
+                     year: 'numeric', 
+                     month: 'long', 
+                     day: 'numeric',
+                     timeZone: 'UTC' // <--- FORCES UTC DATA
+                  })
                 : "Date to be announced";
 
+            //  Format Time in UTC (Will show exactly 9:00 am)
             const formattedTime = isValidDate 
-                ? eventObj.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true })
-                : "Time to be announced";
+                ? eventObj.toLocaleTimeString('en-AU', { 
+                     hour: 'numeric', 
+                     minute: '2-digit', 
+                     hour12: true,
+                     timeZone: 'UTC' // <--- FORCES UTC DATA
+                  })
+                : "Time to be announced"; 
+
 
             // 5. Send the Email
             const msg = {
