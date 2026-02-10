@@ -266,7 +266,12 @@ app.storageQueue('ProcessRegistration', {
                      hour12: true,
                      timeZone: 'UTC' // <--- FORCES UTC DATA
                   })
-                : "Time to be announced"; 
+                : "Time to be announced";
+                
+            // 1. Prepare Data for QR (Ensure Ticket ID is safe for a URL)
+            const qrData = encodeURIComponent(newRegistration.id);
+            // Add a random 'v' parameter to prevent email clients from showing an old cached version
+            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}&v=${Date.now()}`;
             
             // This creates a safe URL for Google Maps by replacing spaces with '+'
             const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
@@ -284,8 +289,8 @@ app.storageQueue('ProcessRegistration', {
                `&details=${encodeURIComponent('Please bring your ticket ID: ' + newRegistration.id)}` +
                `&location=${encodeURIComponent(event.location)}`;
 
-           // This creates an image URL that generates a 150x150 QR code for the Ticket ID
-            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(newRegistration.id)}`;
+        //    // This creates an image URL that generates a 150x150 QR code for the Ticket ID
+        //     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(newRegistration.id)}`;
 
             // 5. Send the Email
             const msg = {
@@ -311,13 +316,17 @@ app.storageQueue('ProcessRegistration', {
                                 <p style="margin: 10px 0;"> <strong>Time:</strong> ${formattedTime}</p>
                             </div>
 
-                            <div style="text-align: center; margin: 20px 0;">
-                                 <p style="font-size: 12px; color: #888; margin-bottom: 5px;">Scan at Entrance</p>
-                                 <img src="${qrCodeUrl}" alt="Ticket QR Code" style="border: 1px solid #eee; padding: 10px; border-radius: 10px; background: white;" />
+                            <div style="text-align: center; margin: 30px 0;">
+                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">SCAN FOR ENTRY</p>
+                                <img src="${qrCodeUrl}" 
+                                     alt="QR Code" 
+                                     width="150" 
+                                     height="150" 
+                                     style="display: block; margin: 0 auto; border: 1px solid #ddd; padding: 5px; background: #fff;" />
                             </div>
 
-                            <p style="font-size: 13px; color: #666; word-break: break-all; text-align: center;">
-                                <strong>Ticket ID:</strong> ${newRegistration.id}
+                            <p style="font-size: 11px; color: #999; text-align: center; word-break: break-all;">
+                                ID: ${newRegistration.id}
                             </p>
 
                             <div style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed #e0e0e0; text-align: center;">
