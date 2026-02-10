@@ -271,6 +271,19 @@ app.storageQueue('ProcessRegistration', {
             // This creates a safe URL for Google Maps by replacing spaces with '+'
             const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
 
+            // Format the dates for Google (Remove dashes, colons, and the space we trimmed earlier)
+            const startTime = eventObj.toISOString().replace(/-|:|\.\d+/g, '');
+           // Set end time for 2 hours later as a default
+           const endDate = new Date(eventObj.getTime() + 2 * 60 * 60 * 1000);
+           const endTime = endDate.toISOString().replace(/-|:|\.\d+/g, '');
+
+           // 2. Build the Google Calendar URL
+           const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE` +
+               `&text=${encodeURIComponent(event.title)}` +
+               `&dates=${startTime}/${endTime}` +
+               `&details=${encodeURIComponent('Please bring your ticket ID: ' + newRegistration.id)}` +
+               `&location=${encodeURIComponent(event.location)}`;
+
             // 5. Send the Email
             const msg = {
                 to: queueItem.email,
@@ -290,19 +303,21 @@ app.storageQueue('ProcessRegistration', {
                             
                             <div style="background-color: #f3f2f1; padding: 25px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #0078d4;">
                                 <h2 style="margin-top: 0; color: #0078d4; font-size: 22px;">${event.title}</h2>
-                                <p style="margin: 10px 0;"> 
-                                    <strong>Location:</strong> ${event.location} 
-                                    <br />
-                                    <a href="${mapsUrl}" style="color: #0078d4; text-decoration: none; font-size: 12px;"> Get Directions</a>
-                                </p>
+                                <p style="margin: 10px 0;"> <strong>Location:</strong> ${event.location}</p>
                                 <p style="margin: 10px 0;"> <strong>Date:</strong> ${formattedDate}</p>
                                 <p style="margin: 10px 0;"> <strong>Time:</strong> ${formattedTime}</p>
                             </div>
 
                             <p style="font-size: 13px; color: #666; word-break: break-all;"><strong>Ticket ID:</strong> ${newRegistration.id}</p>
-                        </div>
-                        <div style="background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee;">
-                            © 2026 Microsoft Student Accelerator. All rights reserved.
+
+                            <div style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed #e0e0e0; text-align: center;">
+                                <a href="${calendarUrl}" style="background-color: #34a853; color: white; padding: 12px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; margin: 5px;">
+                                     Add to Google Calendar
+                                </a>
+                                <a href="${mapsUrl}" style="background-color: #0078d4; color: white; padding: 12px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; margin: 5px;">
+                                     Get Directions
+                                </a>
+                            </div>
                         </div>
                     </div>
                 `,
