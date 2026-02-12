@@ -301,7 +301,9 @@ app.storageQueue('ProcessRegistration', {
                     email: 'anatempl2025@gmail.com',
                     name: 'Evently Ticket Confirmation'
                 },
+                replyTo: 'anatempl2025@gmail.com',
                 subject: ` Ticket Confirmed: ${event.title}`,
+                text: `Hi ${queueItem.fullName}, your registration for ${event.title} is confirmed! Your Ticket ID is ${newRegistration.id}. Please check this email on a device that can display images to see your QR code.`,
                 html: `
                     <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                         <div style="background-color: #0078d4; padding: 30px; text-align: center; color: white;">
