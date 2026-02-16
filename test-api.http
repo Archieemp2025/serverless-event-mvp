@@ -26,7 +26,25 @@ Content-Type: application/json
 
 
 ### Get all events
-GET http://localhost:7071/api/GetEvents
+//GET http://localhost:7071/api/GetEvents
+//GET http://localhost:7071/api/GetPublicEvents
+
+### Define the variable (NO quotes around the value here)
+@token = 6isNYzDnPZCy9WPPZSrmAI_CGkuDW3eT6JLQAHt0
+
+### Test PredictHQ Places API
+GET https://api.predicthq.com/v1/places/?q=Melbourne&country=AU
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Get ONLY the count of Melbourne events
+GET https://api.predicthq.com/v1/events/count/?place.exact=2158177&category=concerts,festivals,sports,performing-arts
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+### Test your Local Azure Function
+GET http://localhost:7071/api/GetPublicEvents
 
 
 ### Test RegisterUser (Local)
