@@ -205,6 +205,7 @@ import axios from 'axios';
 import { Search, Calendar as LogoIcon, Plus } from 'lucide-react'; 
 import EventCard from './components/EventCard';
 import CreateEventModal from './components/CreateEventModal'; 
+import Header from './components/Header'
 
 function App() {
   const [events, setEvents] = useState([]);
@@ -247,23 +248,8 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
       
-      {/* --- OPTION B: INLINE HEADER --- */}
-      <header className="bg-white border-b px-8 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center gap-2">
-          <div className="bg-indigo-600 p-2 rounded-lg text-white">
-            <LogoIcon size={24} />
-          </div>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Evently MVP</h1>
-        </div>
-
-        {/* 4. This button directly opens the modal */}
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-100"
-        >
-          <Plus size={20} /> Create Event
-        </button>
-      </header>
+      {/* 1. Use the Header component and pass the 'onCreateClick' prop */}
+      <Header onCreateClick={() => setIsModalOpen(true)} /> 
 
       <main className="max-w-7xl mx-auto p-8">
         {/* Search Bar */}
