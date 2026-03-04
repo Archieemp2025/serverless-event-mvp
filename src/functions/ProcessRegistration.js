@@ -344,6 +344,14 @@ app.storageQueue('ProcessRegistration', {
                         </div>
                     </div>
                 `,
+                trackingSettings: {
+                    clickTracking: { enable: false, enableText: false },
+                    openTracking: { enable: false },
+                    subscriptionTracking: { enable: false }
+                },
+                mailSettings: {
+                    sandboxMode: { enable: false }
+                }
             };
 
             await sgMail.send(msg);
