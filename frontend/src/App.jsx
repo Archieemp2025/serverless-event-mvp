@@ -249,7 +249,10 @@ function App() {
     <div className="min-h-screen bg-slate-50 font-sans">
       
       {/* 1. Use the Header component and pass the 'onCreateClick' prop */}
-      <Header onCreateClick={() => setIsModalOpen(true)} /> 
+      <Header onCreateClick={() => {
+          console.log("App.jsx: Setting Modal to Open");
+          setIsModalOpen(true);
+      }} />
 
       <main className="max-w-7xl mx-auto p-8">
         {/* Search Bar */}
